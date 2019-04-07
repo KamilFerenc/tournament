@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %} Play match {% endblock title %}
+{% block content %}
+<div>
+    <h2>{{ event.competition_name}} - {{ event.city }}</h2>
+    <h3>{{player1.first_name }} {{player1.last_name}} vs
+        {{player2.first_name }} {{player2.last_name}}</h3>
+    <div>
+        {% with p1_set=match.player1_won_sets p2_set=match.player2_won_sets %}
+        <span>{{ player1.first_name }} won {{ p1_set }} set{{ p1_set|pluralize }}</span>
+        <span>{{ player2.first_name }} won {{ p2_set }} set{{ p2_set|pluralize }}</span>
+        {% endwith %}
+    </div>
+    <form action="." method="post">
+        {% csrf_token %}
+    <a href="{% url 'tournament:play_set' match_id=match.id %}"> Start new set</a>
+    </form>
+</div>
+{% endblock %}

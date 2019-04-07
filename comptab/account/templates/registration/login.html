@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class='container-login-page login-page'>
+    {% if messages %}
+    {% for message in messages %}
+        <h1> {{ message }}</h1>
+    {% endfor %}
+    {% endif %}
+    {% if not user.is_authenticated %}
+    <h1>Log In</h1>
+    {% if form.errors %}
+    <p>Login or password is incorrect.Try again.</p>
+    <p>If you don't remember your Username enter your email.</p>
+    {% else %}
+    <p>Fill in form to log in or or create an account
+        <a href="{% url 'account:register' %}">here</a>.</p>
+    {% endif %}
+    <div>
+        <form action="{% url 'login' %}" method="post">
+            {{ form.as_p }}
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ next }}">
+            <p><input type="submit" value="Log In"></p>
+        </form>
+        <p>Did you forget the password? Click the
+        <a href="{% url 'password_reset' %}">link</a>.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load thumbnail %}
+
+{% block title%}All competitors{% endblock %}
+
+{% block content %}
+<div>
+    <h2>All competitors</h2>
+    <div>
+        {% for user in users %}
+        <div>
+            <a href="{{ user.get_absolute_url }}">
+            {% thumbnail user.photo "100x100" crop="100%" as im %}
+            <img src="{{ im.url }}"></a>
+            {% endthumbnail %}
+            <a href="{{ user.get_absolute_url }}">
+            {{ user.get_full_name }}</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

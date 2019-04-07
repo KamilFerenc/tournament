@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}All events{% endblock %}
+
+{% block content %}
+<div class='container-event-list'>
+    <h2>All events</h2>
+    <div class='events-list'>
+    {% for event in events %}
+        <div>
+            <h4><a href="{{ event.get_absolute_url }}"> {{ event.competition_name }}</a> - {{ event.city }}, {{ event.competition_date }}</h4>
+             <div class='events-list-event'>
+                {% if event.poster %}
+                <a href="{{ event.get_absolute_url }}"><img class='events-list-logo' src="{{ event.poster.url }}"></a>
+                    {% else %}
+                <a href="{{ event.get_absolute_url }}"><img class='events-list-logo' src="{{ '/media/cups/sample_poster.jpeg' }}"></a>
+                {% endif %}
+            </div>
+            <p>{{ event.description }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% include "pagination.html" with page=events %}
+{% endblock %}

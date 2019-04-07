@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load thumbnail %}
+
+{% block title%}{{ user.get_full_name }}{% endblock %}
+
+{% block content %}
+<div>
+    <h2>{{ user.get_full_name }}</h2>
+    <div>
+        {% thumbnail user.photo "120x120" crop="100%" as im %}
+        <img src="{{ im.url }}">
+        {% endthumbnail %}
+    </div>
+    <div>
+        <h4> {{ user.get_full_name }} is signed up for:</h4>
+        {% for event in events %}
+        <p><a href="{{ event.get_absolute_url }}">{{ event.competition_name }}</a></p>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %} Tournament tree {% endblock title %}
+
+{% block content %}
+<div>
+    {{ event.competition_name }}
+    {% for key, value in pairs.items %}
+    <p>{{ value.0.get_full_name }} versus {{ value.1.get_full_name }}
+        <a href="{% url 'tournament:match' player1_id=value.0.id player2_id=value.1.id event_id=event.id %}">Play match</a></p>
+
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load thumbnail %}
+
+{% block title %}Main Page{% endblock %}
+
+{% block content %}
+<div class='container-dashboard'>
+    <div class='dashboard-block dashboard-block-user'>
+        {% if user.is_authenticated %} 
+        {% thumbnail user.photo "180x180" crop="100%" as im %}
+            <img class='dashboard-profile-img' src="{{ im.url }}">
+        {% endthumbnail %}
+        <a class='dashboard-link' href="{% url 'account:edit' %}">Edit profile</a>
+        <a class='dashboard-link' href="{% url 'password_change' %}">Change password</a>
+        {% endif %}
+        {% if user.is_organizer %}
+        <a class='dashboard-link' href="{% url 'competition:event_create' %}">Create event</a>
+        {% endif %}
+    </div>
+    <div class='dashboard-block dashboard-block-events'>
+    <h1 class='page-title'>Main Page</h1>
+    {% if messages %}
+    {% for message in messages %}
+        <p>{{ message }}</p>
+    {% endfor %}
+    {% endif %}
+
+    {% if user.is_competitor and sign_up_events %}
+    <h3>You are sign up for events:</h3>
+    <div class='dashboard-events'>
+        {% for event in sign_up_events %}
+    <div class='dashboard-events-event'>
+        {% if event.poster %}
+        <a href="{{ event.get_absolute_url }}"><img class='dashboard-event-logo' src="{{ event.poster.url }}"></a>
+        {% else %}
+        <a href="{{ event.get_absolute_url }}"><img class='dashboard-event-logo' src="{{ '/media/cups/sample_poster.jpeg' }}"></a>
+        {% endif %}
+        <a href="{{ event.get_absolute_url }}">{{event.competition_name }}</a><p class='dashboard-event-date'> {{ event.competition_date }}</p>
+    </div>
+        {% empty %}
+        <p>You didn't sign up for any events.</p>
+        {% endfor %}
+        {% endif %}
+    </div>
+    {% if user.is_organizer and organized_events %}
+    <h3>You organized this events:</h3>
+    <div class='dashboard-events'>
+        {% for event in organized_events %}
+    <div class='dashboard-events-event'>
+        {% if event.poster %}
+        <a href="{{ event.get_absolute_url }}"><img class='dashboard-event-logo' src="{{ event.poster.url }}"></a>
+        {% else %}
+        <a href="{{ event.get_absolute_url }}"><img class='dashboard-event-logo' src="{{ '/media/cups/sample_poster.jpeg' }}"></a>
+        {% endif %}
+        <a href="{{ event.get_absolute_url }}">{{event.competition_name }}</a><p class='dashboard-event-date'> {{ event.competition_date }} </p>
+    </div>
+        {% empty %}
+        <p>You didn't sign up for any events.</p>
+        {% endfor %}
+        {% endif %}
+    </div>
+    </div>
+</div>
+{% endblock %}

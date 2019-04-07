@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %} {{ event.competition_name }} {% endblock title %}
+
+{% block content %}
+<div>
+    <h3>{{ event.competition_name }} - {{ event.discipline.discipline }}</h3>
+
+    <div>
+        {% if messages %}
+        {% for message in messages %}
+        <h4>{{ message }}</h4>
+        {% endfor %}
+        {% endif %}
+    </div>
+    <div>
+        <img src="{{ event.competition_rank.cup.url }}" height="80" width="80">
+    </div>
+    <div>
+        {% if event.poster %}
+        <img src="{{ event.poster.url }}"  height="80" width="80">
+        {% endif %}
+    </div>
+    <div>
+        <p>{{ event.city}}, {{event.competition_date}}</p>
+        <p>Deadline for applications - {{ event.applications_deadline}}</p>
+        <p>{{event.description}}</p>
+    </div>
+    <div>
+        <p>Adress:</p>
+        <p>{{ event.street }} {{ event.number }}</p>
+        <p>{{ event.city }}, {{ event.country }}</p>
+        <p> Organizer: {{event.organizer.first_name}} {{ event.organizer.last_name }} - {{event.organizer.email}}</p>
+    </div>
+    <div>
+        {% if request.user in event.competitors.all %}
+        <a href="{% url 'competition:resign' id=event.id %}">Resign</a>
+        {% endif %}
+        {% if request.user.is_competitor and request.user not in event.competitors.all  %}
+        <a href="{% url 'competition:sign_up' id=event.id %}">Sign up</a>
+        {% endif %}
+    </div>
+    <div>
+        {% if request.user == event.organizer %}
+        <p><a href="{% url 'competition:event_edit' id=event.id competition_name=event.competition_name %}">Edit information</a></p>
+        <p><a href="{% url 'tournament:tournament' id=event.id competition_name=event.competition_name %}">Start tournament</a></p>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

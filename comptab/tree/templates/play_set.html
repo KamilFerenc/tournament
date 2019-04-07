@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+
+{% block title %} Play set {% endblock title %}
+{% block content %}
+<div>
+    <h3> {{ event.competition_name }} - {{ event.city }}</h3>
+    {% with p1_set=match.player1_won_sets p2_set=match.player2_won_sets %}
+    <div>
+        <span>{{ player_1.first_name }} won {{ p1_set }} set{{ p1_set|pluralize }}</span>
+        <span>Score {{ player_1.first_name }} {{ player_1.last_name }} - {{ set.player_1_score }}</span>
+        <a href="{% url 'tournament:add_points' set_id=set.id player=1 %}">Add score {{ player_1.first_name }}</a>
+    </div>
+    <div>
+        <span>{{ player_2.first_name }} won {{ p2_set }} set{{ p2_set|pluralize }}</span>
+        <span>Score {{ player_2.first_name }} {{ player_2.last_name }} - {{ set.player_2_score }}</span>
+        <a href="{% url 'tournament:add_points' set_id=set.id player=2 %}">Add score {{ player_2.first_name }}</a>
+    </div>
+</div>
+{% endwith %}
+{% endblock %}

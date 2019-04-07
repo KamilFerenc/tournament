@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit event{% endblock %}
+
+{% block content %}
+<div>
+    <h1>Edit event</h1>
+    <p>You can change event information using bellow form.</p>
+    <form action="." method="post" enctype="multipart/form-data">
+        {{ event_form.as_p }}
+        {% csrf_token %}
+        <p><input type="submit" value="Send"></p>
+    </form>
+</div>
+
+{% endblock %}

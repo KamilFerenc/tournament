@@ -1,0 +1,46 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>{% block title %}{% endblock %}</title>
+    <link href="{% static 'css/base.css' %}" rel="stylesheet">
+      <meta charset="utf-8">
+    {% load bootstrap4 %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript jquery='full' %}
+    {{ form.media }}
+    {{ user_form.media }}
+    {{ event_form.media }}
+</head>
+<body>
+<main class='container-main'>
+<div class='welcome-msg'>
+    {% if request.user.is_authenticated %}
+    <span>Welcome {{ request.user.first_name }}!</span>
+    <a href="{% url 'logout' %}">Log Out</a>
+    {% else %}
+        <a href="{% url 'login' %}">Log In</a>
+    {% endif %}
+</div>
+
+{% if request.user.is_authenticated %}
+<ul class='navigation-main'>
+    <li class='navigation-main-item'{% if section == "dashboard" %}class="selected" {% endif %}>
+        <a href="{% url 'account:dashboard' %}">Main page</a>
+    </li>
+    <li class='navigation-main-item'{% if section == "competition" %}class="selected" {% endif %}>
+        <a href="{% url 'competition:list' %}">All events</a>
+    </li>
+    <li class='navigation-main-item'{% if section == "competitors" %}class="selected" {% endif %}>
+        <a href="{% url 'account:user_list' %}">All competitors</a>
+    </li>
+</ul>
+{% endif %}
+
+{% block content %}
+{% endblock %}
+</main>
+</body>
+</html>
+
