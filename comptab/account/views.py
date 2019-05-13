@@ -61,7 +61,6 @@ def activate(request, uidb64, token):
     else:
         return HttpResponse('Activation link is invalid.')
 
-
 @login_required
 def dashboard(request):
     user = request.user

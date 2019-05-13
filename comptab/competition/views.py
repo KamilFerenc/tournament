@@ -98,6 +98,7 @@ def sign_up(request, id):
                         competition_name=event.competition_name)
 
 
+
 @login_required
 def resign(request, id):
     event = Event.objects.get(id=id)
