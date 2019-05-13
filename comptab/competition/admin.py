@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Event, EventRank, EventDiscipline, MaxEventCompetitors
+from .models import Event, EventRank, EventDiscipline
 
 
 class EventAdmin(admin.ModelAdmin):
@@ -16,11 +16,6 @@ class EventDisciplineAdmin(admin.ModelAdmin):
     list_display = ['discipline']
 
 
-class MaxCompetitorsAdmin(admin.ModelAdmin):
-    list_display = ['max_competitors']
-
-
 admin.site.register(Event, EventAdmin)
 admin.site.register(EventRank, EventRankAdmin)
 admin.site.register(EventDiscipline, EventDisciplineAdmin)
-admin.site.register(MaxEventCompetitors, MaxCompetitorsAdmin)

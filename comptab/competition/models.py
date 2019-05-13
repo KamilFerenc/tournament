@@ -3,14 +3,6 @@ from django.conf import settings
 from django.urls import reverse
 
 
-class MaxEventCompetitors(models.Model):
-
-    max_competitors = models.PositiveIntegerField()
-
-    def __str__(self):
-        return "{}".format(self.max_competitors)
-
-
 class EventRank(models.Model):
 
     competition_rank = models.CharField(max_length=30)
@@ -48,8 +40,7 @@ class Event(models.Model):
                                blank=True, null=True)
     competitors = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True,
                                          related_name='event_competitors')
-    max_competitors = models.ForeignKey(MaxEventCompetitors,
-                                        on_delete=models.CASCADE)
+    max_competitors = models.PositiveIntegerField(blank=True, null=True)
 
     class Meta:
         ordering = ('-competition_date',)

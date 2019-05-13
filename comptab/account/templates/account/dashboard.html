@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 {% load thumbnail %}
-
+{% load static %}
 {% block title %}Main Page{% endblock %}
 
 {% block content %}
 <div class='container-dashboard'>
     <div class='dashboard-block dashboard-block-user'>
-        {% if user.is_authenticated %} 
+        {% if user.is_authenticated %}
         {% thumbnail user.photo "180x180" crop="100%" as im %}
             <img class='dashboard-profile-img' src="{{ im.url }}">
         {% endthumbnail %}
@@ -33,7 +33,7 @@
         {% if event.poster %}
         <a href="{{ event.get_absolute_url }}"><img class='dashboard-event-logo' src="{{ event.poster.url }}"></a>
         {% else %}
-        <a href="{{ event.get_absolute_url }}"><img class='dashboard-event-logo' src="{{ '/media/cups/sample_poster.jpeg' }}"></a>
+        <a href="{{ event.get_absolute_url }}"><img class='dashboard-event-logo' src="{% static 'images/sample_poster.jpeg' %}"></a>
         {% endif %}
         <a href="{{ event.get_absolute_url }}">{{event.competition_name }}</a><p class='dashboard-event-date'> {{ event.competition_date }}</p>
     </div>
@@ -50,7 +50,7 @@
         {% if event.poster %}
         <a href="{{ event.get_absolute_url }}"><img class='dashboard-event-logo' src="{{ event.poster.url }}"></a>
         {% else %}
-        <a href="{{ event.get_absolute_url }}"><img class='dashboard-event-logo' src="{{ '/media/cups/sample_poster.jpeg' }}"></a>
+        <a href="{{ event.get_absolute_url }}"><img class='dashboard-event-logo' src="{% static 'images/sample_poster.jpeg' %}"></a>
         {% endif %}
         <a href="{{ event.get_absolute_url }}">{{event.competition_name }}</a><p class='dashboard-event-date'> {{ event.competition_date }} </p>
     </div>

@@ -62,6 +62,7 @@ def activate(request, uidb64, token):
         return HttpResponse('Activation link is invalid.')
 
 
+@login_required
 def dashboard(request):
     user = request.user
     sign_up_events = \
@@ -101,7 +102,6 @@ def competitors_list(request):
 def user_detail(request, username):
     user = get_object_or_404(User, username=username, is_active=True)
     sign_up_event = Event.objects.filter(competitors=user)
-    print(sign_up_event)
     return render(request, 'account/user/detail.html',
                   {'user': user, 'section': 'people',
                    'events': sign_up_event})

@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block title %}All events{% endblock %}
 
 {% block content %}
@@ -13,7 +13,7 @@
                 {% if event.poster %}
                 <a href="{{ event.get_absolute_url }}"><img class='events-list-logo' src="{{ event.poster.url }}"></a>
                     {% else %}
-                <a href="{{ event.get_absolute_url }}"><img class='events-list-logo' src="{{ '/media/cups/sample_poster.jpeg' }}"></a>
+                <a href="{{ event.get_absolute_url }}"><img class='events-list-logo' src="{% static 'images/sample_poster.jpeg' %}"></a>
                 {% endif %}
             </div>
             <p>{{ event.description }}</p>

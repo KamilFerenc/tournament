@@ -1,9 +1,6 @@
 # tournament
 
-Tournament is Django app that allows sport competition organization, registration and tracking results.
-This is a recruitment task, I developed it on company's gitlab and pushed final version to my github - that's why it has only one commit. I worked on the task 7 days.
-
-
+Tournament is Django app that allows sport competition organization, registration and tracking results. This is a recruitment task, I developed it on company's gitlab and pushed final version to my github - that's why it has a few commits.
 
 ## Features
 ### User - organizer/competitor
@@ -16,7 +13,7 @@ This is a recruitment task, I developed it on company's gitlab and pushed final 
 - Event creation and modification,
 - Event registration with confirmation email
 
-### Features that are not finished
+###Features that are not finished
 
 - Match result tree creation (works only under certain conditions),
 - Adding match result (works only under certain conditions)
@@ -68,5 +65,3 @@ EMAIL_HOST_PASSWORD = 'email_password'
 - Run command: ```python manage.py migrate```
 - Run command: ```python manage.py runserver```
 - Open web browser at address ```http://127.0.0.1:8000/```
-# tournament
-# tournament

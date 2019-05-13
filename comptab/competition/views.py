@@ -75,13 +75,14 @@ def sign_up(request, id):
     all_competitors = event.competitors.count()
     date_today = date.today()
     user = request.user
-    if event.max_competitors.max_competitors <= all_competitors:
-        messages.warning(request,
-                         'Sorry, registration is closed. Maximum numbers of '
-                         'competitors has been reached. You cannot sign up.')
-        return redirect('competition:event_detail', id=event.id,
-                        competition_name=event.competition_name)
-    elif date_today <= event.applications_deadline:
+    if event.max_competitors:
+        if event.max_competitors <= all_competitors:
+            message = 'Sorry, registration is closed. Maximum numbers of ' \
+                      'competitors has been reached. You cannot sign up.'
+            messages.warning(request, message)
+            return redirect('competition:event_detail', id=event.id,
+                            competition_name=event.competition_name)
+    if date_today <= event.applications_deadline:
         event.competitors.add(user)
         event.save()
         messages.success(request, 'You sign up correctly.')
@@ -90,9 +91,9 @@ def sign_up(request, id):
         return redirect('competition:event_detail', id=event.id,
                         competition_name=event.competition_name)
     else:
-        messages.warning(request,
-                         'Sorry, the deadline for registration has expired. '
-                         'You cannot sign up.')
+        message_deadline = 'Sorry, the deadline for registration has ' \
+                           'expired. You cannot sign up.'
+        messages.warning(request, message_deadline)
         return redirect('competition:event_detail', id=event.id,
                         competition_name=event.competition_name)
 
