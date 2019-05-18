@@ -1,3 +1,4 @@
+import tempfile
 from .settings import *
 DATABASES = {
     'default': {
@@ -6,3 +7,5 @@ DATABASES = {
     }
 }
 EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
+
+MEDIA_ROOT = os.path.join(tempfile.gettempdir(), 'tournament_test/')
