@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import EmailMessage
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template.loader import render_to_string
 from .forms import EventCreateForm
@@ -53,20 +53,30 @@ def event_list(request):
 
 @login_required
 def event_edit(request, id, competition_name):
-    if request.method == "POST":
-        event_form = EventCreateForm(instance=Event.objects.get(id=id), data=request.POST,
-                                     files=request.FILES)
-        if event_form.is_valid():
-            event_form.save()
-            competition_name = Event.objects.get(id=id).competition_name
-            messages.success(request, 'Edit event has finished successfully.')
-            return redirect('competition:event_detail', id=id,
-                            competition_name=competition_name)
+    event = Event.objects.get(id=id)
+    if request.user == event.organizer:
+        if request.method == "POST":
+            event_form = EventCreateForm(instance=Event.objects.get(id=id),
+                                         data=request.POST, files=request.FILES)
+            if event_form.is_valid():
+                event_form.save()
+                event.refresh_from_db()
+                competition_name = event.competition_name
+                messages.success(request,
+                                 'Edit event has finished successfully.')
+                return redirect('competition:event_detail', id=id,
+                                competition_name=competition_name)
 
+        else:
+            event_form = EventCreateForm(instance=Event.objects.get(id=id))
+
+        return render(request, 'events/event/edit.html',
+                      {'event_form': event_form})
     else:
-        event_form = EventCreateForm(instance=Event.objects.get(id=id))
-
-    return render(request, 'events/event/edit.html', {'event_form': event_form})
+        messages.warning(request,
+                         "You don't have permission for editing this event.")
+        return redirect('competition:event_detail', id=id,
+                        competition_name=competition_name)
 
 
 @login_required
@@ -75,28 +85,35 @@ def sign_up(request, id):
     all_competitors = event.competitors.count()
     date_today = date.today()
     user = request.user
-    if event.max_competitors:
-        if event.max_competitors <= all_competitors:
-            message = 'Sorry, registration is closed. Maximum numbers of ' \
-                      'competitors has been reached. You cannot sign up.'
-            messages.warning(request, message)
+    if user.is_competitor:
+        if event.max_competitors:
+            if event.max_competitors <= all_competitors:
+                message = 'Sorry, registration is closed. Maximum numbers of ' \
+                          'competitors has been reached. You cannot sign up.'
+                messages.warning(request, message)
+                return redirect('competition:event_detail', id=event.id,
+                                competition_name=event.competition_name)
+        if date_today <= event.applications_deadline:
+            event.competitors.add(user)
+            event.save()
+            messages.success(request, 'You sign up correctly.')
+            domain = get_current_site(request).domain
+            sign_up_email_confirmation(domain=domain, event=event, user=user)
             return redirect('competition:event_detail', id=event.id,
                             competition_name=event.competition_name)
-    if date_today <= event.applications_deadline:
-        event.competitors.add(user)
-        event.save()
-        messages.success(request, 'You sign up correctly.')
-        domain = get_current_site(request).domain
-        sign_up_email_confirmation(domain=domain, event=event, user=user)
-        return redirect('competition:event_detail', id=event.id,
-                        competition_name=event.competition_name)
+        else:
+            message_deadline = 'Sorry, the deadline for registration has ' \
+                               'expired. You cannot sign up.'
+            messages.warning(request, message_deadline)
+            return redirect('competition:event_detail', id=event.id,
+                            competition_name=event.competition_name)
     else:
-        message_deadline = 'Sorry, the deadline for registration has ' \
-                           'expired. You cannot sign up.'
-        messages.warning(request, message_deadline)
+        message_user_not_competitor = \
+            "Sorry, you aren't competitor. " \
+            "If you want to sign up for the competition edit the profile."
+        messages.warning(request, message_user_not_competitor)
         return redirect('competition:event_detail', id=event.id,
                         competition_name=event.competition_name)
-
 
 
 @login_required
