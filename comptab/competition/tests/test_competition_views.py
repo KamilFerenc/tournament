@@ -322,3 +322,27 @@ class TestSignupView(TestCase):
             'competition:event_detail',
             args=[self.event.pk, self.event.competition_name]) in resp.url
         assert expected_message in self.client.cookies['messages'].value
+
+
+class TestResignView(TestCase):
+
+    def setUp(self):
+        self.client = Client()
+        self.event = mixer.blend('competition.Event')
+        self.user = mixer.blend('account.User')
+        self.event.competitors.add(self.user)
+
+    def test_resign(self):
+        self.client.force_login(self.user)
+        # user should be in event.competitors (before calling resign view)
+        assert self.user in self.event.competitors.all()
+        resp = self.client.get(reverse('competition:resign',
+                                       args=[self.event.id]))
+        expected_message = 'You resign from competition.'
+        assert resp.status_code == 302
+        assert reverse(
+            'competition:event_detail',
+            args=[self.event.pk, self.event.competition_name]) in resp.url
+        assert expected_message in self.client.cookies['messages'].value
+        # user shouldn't be in event.competitors (after calling resign view)
+        assert self.user not in self.event.competitors.all()
