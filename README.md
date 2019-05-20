@@ -1,19 +1,22 @@
-# tournament
+ # tournament
 
-Tournament is Django app that allows sport competition organization, registration and tracking results. This is a recruitment task, I developed it on company's gitlab and pushed final version to my github - that's why it has a few commits.
+Tournament is Django app that allows sport competition organization, registration and tracking results. Project is still developing but it's available on Heroku. 
+[kamilferencapp](https://kamilferencapp.herokuapp.com/) 
 
 ## Features
 ### User - organizer/competitor
 - User registration with confirmation email,
 - User profile edition,
 - Password change,
-- Forgot password reminder
+- Forgot password reminder,
+- Fully covered by unit tests
 
 ### Competition - event
 - Event creation and modification,
-- Event registration with confirmation email
+- Event registration with confirmation email,
+- Fully covered by unit tests
 
-###Features that are not finished
+### Features that are not finished
 
 - Match result tree creation (works only under certain conditions),
 - Adding match result (works only under certain conditions)
