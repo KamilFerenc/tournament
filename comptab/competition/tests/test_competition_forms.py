@@ -1,12 +1,9 @@
 import datetime
 import pytest
-from django.core.exceptions import ObjectDoesNotExist
-from django.db.utils import IntegrityError
 from django.forms import forms as django_form
 from django.test import TestCase
 from mixer.backend.django import mixer
-from competition import forms
-from competition import models
+from competition import forms, models
 
 pytestmark = pytest.mark.django_db
 
@@ -66,13 +63,9 @@ class TestEventCreateForm(SetupClass):
     def test_form_invalid_competition_date(self):
         form_invalid_competition_date = {
             **self.form_data_valid,
-            'competition_date': super().past_date()
+            'competition_date': self.past_date()
         }
         form = forms.EventCreateForm(data=form_invalid_competition_date)
-        if form.is_valid():
-            new_event = form.save(commit=False)
-            new_event.organizer_id = self.organizer.pk
-            new_event.save()
         expected_error = \
             "'Competition date' is incorrect. Date must  be in the future."
 
@@ -80,20 +73,13 @@ class TestEventCreateForm(SetupClass):
         assert form.is_valid() is False
         with self.assertRaises(django_form.ValidationError):
             form.clean()
-        with self.assertRaises(ObjectDoesNotExist):
-            models.Event.objects.get(competition_name=
-                                     self.form_data_valid['competition_name'])
 
     def test_form_invalid_applications_deadline(self):
         form_invalid_applications_deadline = {
             **self.form_data_valid,
-            'applications_deadline': super().past_date()
+            'applications_deadline': self.past_date()
         }
         form = forms.EventCreateForm(data=form_invalid_applications_deadline)
-        if form.is_valid():
-            new_event = form.save(commit=False)
-            new_event.organizer_id = self.organizer.pk
-            new_event.save()
         expected_error = "'Applications deadline' date is incorrect. " \
                          "Date must be in the future"
 
@@ -101,14 +87,3 @@ class TestEventCreateForm(SetupClass):
         assert form.is_valid() is False
         with self.assertRaises(django_form.ValidationError):
             form.clean()
-        with self.assertRaises(ObjectDoesNotExist):
-            models.Event.objects.get(competition_name=
-                                     self.form_data_valid['competition_name'])
-
-    def test_create_event_no_user(self):
-        form = forms.EventCreateForm(data=self.form_data_valid)
-        new_event = form.save(commit=False)
-        new_event.organizer_id = None
-        assert form.is_valid() is True
-        with self.assertRaises(IntegrityError):
-            new_event.save()
