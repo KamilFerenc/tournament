@@ -3,8 +3,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import EmailMessage
+from django.core import serializers
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template.loader import render_to_string
 from .forms import EventCreateForm
@@ -49,6 +50,10 @@ def event_list(request):
         events = paginator.page(paginator.num_pages)
     return render(request, 'events/event/list.html',
                   {'events': events, 'section': 'competition'})
+    # response =  serializers.serialize('json', events)
+    # return HttpResponse(response, content_type='application/json')
+
+
 
 
 @login_required

@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'tree',
     'bootstrap4',
     'bootstrap_datepicker_plus',
+    'crispy_forms',
 ]
 
 MIDDLEWARE = [
@@ -83,7 +84,7 @@ WSGI_APPLICATION = 'comptab.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'comptab',
+        'NAME': 'tournament',
         'USER': os.environ.get("DB_USER"),
         'PASSWORD': os.environ.get("DB_PASS"),
         'HOST': 'localhost',
@@ -153,3 +154,6 @@ LOGOUT_URL = reverse_lazy('logout')
 BOOTSTRAP4 = {
     'include_jquery': True,
 }
+
+# Crispy form setting
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
