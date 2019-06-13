@@ -7,7 +7,7 @@ from competition import models
 pytestmark = pytest.mark.django_db
 
 
-class TestEventRank:
+class TestEventRank(TestCase):
 
     def test_model(self):
         event_rank = mixer.blend('competition.EventRank', cup='test.jpg')
@@ -25,11 +25,7 @@ class TestEventRank:
         assert result == 'World Championship'
 
 
-class TestEventDiscipline:
-
-    def test_model(self):
-        discipline = mixer.blend('competition.EventDiscipline')
-        assert discipline.pk == 1
+class TestEventDiscipline(TestCase):
 
     def test___str__(self):
         discipline = mixer.blend('competition.EventDiscipline',
@@ -50,7 +46,7 @@ class TestEvent(TestCase):
                             competition_rank=self.competition_rank)
         assert event.pk == 1
         mixer.cycle(9).blend('competition.Event', poster='',
-                                      competition_rank=self.competition_rank_2)
+                             competition_rank=self.competition_rank_2)
         all_events = models.Event.objects.all().count()
         # Should return 10: 1 (event) + 9 (mixer.cycle(9))
         assert all_events == 10
