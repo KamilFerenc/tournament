@@ -56,11 +56,10 @@ def event_edit(request, id, competition_name):
     event = Event.objects.get(id=id)
     if request.user == event.organizer:
         if request.method == "POST":
-            event_form = EventCreateForm(instance=Event.objects.get(id=id),
+            event_form = EventCreateForm(instance=event,
                                          data=request.POST, files=request.FILES)
             if event_form.is_valid():
-                event_form.save()
-                event.refresh_from_db()
+                event = event_form.save()
                 competition_name = event.competition_name
                 messages.success(request,
                                  'Edit event has finished successfully.')
@@ -68,7 +67,7 @@ def event_edit(request, id, competition_name):
                                 competition_name=competition_name)
 
         else:
-            event_form = EventCreateForm(instance=Event.objects.get(id=id))
+            event_form = EventCreateForm(instance=event)
 
         return render(request, 'events/event/edit.html',
                       {'event_form': event_form})
@@ -95,7 +94,6 @@ def sign_up(request, id):
                                 competition_name=event.competition_name)
         if date_today <= event.applications_deadline:
             event.competitors.add(user)
-            event.save()
             messages.success(request, 'You sign up correctly.')
             domain = get_current_site(request).domain
             sign_up_email_confirmation(domain=domain, event=event, user=user)

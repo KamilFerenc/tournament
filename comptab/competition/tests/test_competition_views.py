@@ -8,8 +8,7 @@ from django.urls import reverse
 from mixer.backend.django import mixer
 from competition.tests.test_competition_forms import SetupClass
 from account import models as user_models
-from competition import models
-from competition import views
+from competition import models, views
 
 
 pytestmark = pytest.mark.django_db
@@ -101,14 +100,13 @@ class TestEventCreate(SetupTestsViews):
         assert new_event.organizer == expected_organizer
 
 
-class TestEventDetail(SetupTestsViews):
+class TestEventDetail(TestCase):
 
     def setUp(self):
         self.event = mixer.blend('competition.Event')
         self.user = mixer.blend('account.User')
 
     def test_event_detail_anonymous(self):
-        self.client.logout()
         resp = self.client.get(reverse(
             'competition:event_detail',
             args=[self.event.pk, self.event.competition_name]))
@@ -139,25 +137,67 @@ class TestEventDetail(SetupTestsViews):
 class TestEventsList(SetupClass):
 
     def test_event_list_anonymous(self):
-        # Create 10 instance of Event
-        mixer.cycle(5).blend('competition.Event')
-        req = RequestFactory().get(reverse('competition:list'))
-        resp = views.event_list(req)
-        assert resp.status_code == 200
+        # Create 5 instance of Event
+        events_amount = 5
+        mixer.cycle(events_amount).blend('competition.Event')
+        returned_event = []
+        # Pagination - page = 1
+        resp_page_1 = self.client.get(reverse('competition:list'), {'page': 1})
+        events_page_1 = len(resp_page_1.context['events'].object_list)
+        returned_event.extend(resp_page_1.context['events'].object_list)
+        assert resp_page_1.status_code == 200
+        # Default 3 events per page
+        assert events_page_1 == 3
+
+        # Pagination - page = 2
+        resp_page_2 = self.client.get(reverse('competition:list'), {'page': 2})
+        events_page_2 = len(resp_page_2.context['events'].object_list)
+        returned_event.extend(resp_page_2.context['events'].object_list)
+        assert resp_page_2.status_code == 200
+        # events_page_2 = events_amount - events_page_1 (5 - 3)
+        assert events_page_2 == 2
+
+        # Pagination - page = 3, should return last existing page
+        resp_page_3 = self.client.get(reverse('competition:list'), {'page': 99})
+        assert resp_page_3.status_code == 200
+        assert (resp_page_2.context['events'].object_list
+                == resp_page_3.context['events'].object_list)
+
+        # Compare all returned events
+        assert events_amount == events_page_1 + events_page_2
+        assert (sorted(models.Event.objects.all(), key=lambda x: x.id)
+                == sorted(returned_event, key=lambda x: x.id))
 
     # Testing except block of code - EmptyPage
     def test_event_list_page_out_of_range(self):
         # Describes in views.event_list
         events_per_page = 3
-        mixer.cycle(10).blend('competition.Event')
-        maximum_page = \
-            math.ceil(models.Event.objects.all().count() / events_per_page)
+        # Create 4 events
+        event = mixer.blend('competition.Event',
+                            competition_date='2020-02-15')
+        mixer.blend('competition.Event', competition_date='2019-02-15')
+        mixer.blend('competition.Event', competition_date='2018-02-15')
+        mixer.blend('competition.Event', competition_date='2017-02-15')
+        all_events = models.Event.objects.all().count()
+        maximum_page = math.ceil(all_events / events_per_page)
         # Page out of range (except block - EmptyPage)
         maximum_page += 1
-        req = RequestFactory().get(reverse(
-            'competition:list'), {'page': maximum_page})
-        resp = views.event_list(req)
+        resp = self.client.get(reverse('competition:list'),
+                               {'page': maximum_page})
         assert resp.status_code == 200
+        # Returned object_list should contain 1 event:
+        # all_events(4) - events_per_page(3) = 1
+        assert len(resp.context['events'].object_list) == 1
+        # Last page should contain the event with the latest competition_date
+        assert resp.context['events'].object_list[0] == event
+
+    # Testing except block of code - PageNotAnInteger
+    def test_event_list_page_not_integer(self):
+        mixer.blend('competition.Event', competition_date='2020-02-15')
+        resp = self.client.get(reverse('competition:list'))
+        assert resp.status_code == 200
+        # Returned object_list should contain 1 event:
+        assert len(resp.context['events'].object_list) == 1
 
 
 class TestEventEditView(TestCase):
@@ -346,3 +386,16 @@ class TestResignView(TestCase):
         assert expected_message in self.client.cookies['messages'].value
         # user shouldn't be in event.competitors (after calling resign view)
         assert self.user not in self.event.competitors.all()
+
+    def test_resign_user_not_signed_up(self):
+        user_1 = mixer.blend('account.User', is_competitor=True)
+        self.client.force_login(user_1)
+        # user_1 shouldn't be in event.competitors
+        assert user_1 not in self.event.competitors.all()
+        resp = self.client.get(reverse('competition:resign',
+                                       args=[self.event.id]))
+        assert resp.status_code == 302
+        assert reverse(
+            'competition:event_detail',
+            args=[self.event.pk, self.event.competition_name]) in resp.url
+        assert user_1 not in self.event.competitors.all()
